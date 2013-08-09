@@ -43,6 +43,14 @@ func evalList(l sexprs.List, input Env) uint64 {
 		return evalPlus(l[1], l[2], input)
 	case "not":
 		return evalNot(l[1], input)
+	case "shl1":
+		return evalShl1(l[1], input)
+	case "shr1":
+		return evalShr1(l[1], input)
+	case "shr4":
+		return evalShr4(l[1], input)
+	case "shr16":
+		return evalShr16(l[1], input)
 	case "if0":
 		return evalIf0(l[1], l[2], l[3], input)
 	case "lambda":
@@ -80,6 +88,22 @@ func evalPlus(e1, e2 sexprs.Sexp, input Env) uint64 {
 
 func evalNot(e sexprs.Sexp, input Env) uint64 {
 	return ^Eval(e, input)
+}
+
+func evalShl1(e sexprs.Sexp, input Env) uint64 {
+	return Eval(e, input) << 1
+}
+
+func evalShr1(e sexprs.Sexp, input Env) uint64 {
+	return Eval(e, input) >> 1
+}
+
+func evalShr4(e sexprs.Sexp, input Env) uint64 {
+	return Eval(e, input) >> 4
+}
+
+func evalShr16(e sexprs.Sexp, input Env) uint64 {
+	return Eval(e, input) >> 16
 }
 
 func evalIf0(p, zero, nonZero sexprs.Sexp, input Env) uint64 {
