@@ -42,6 +42,8 @@ func countMutationPointsInList(l s.List) int {
 		return CountMutationPoints(l[1]) + CountMutationPoints(l[2])
 	case "if0":
 		return CountMutationPoints(l[1]) + CountMutationPoints(l[2]) + CountMutationPoints(l[3])
+	case "lambda":
+		return CountMutationPoints(l[2])
 	case "fold":
 		return countMutationPointsInFold(l[1], l[2], l[3])
 	default:
@@ -97,8 +99,8 @@ func mutateList(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 		return mutateOp2(l, where, m, vars)
 	case "if0":
 		return mutateIf0(l, where, m, vars)
-  case "lambda":
-    return mutateLambda(l, where, m, vars)
+	case "lambda":
+		return mutateLambda(l, where, m, vars)
 	case "fold":
 		return mutateFold(l, where, m, vars)
 	default:
@@ -130,19 +132,17 @@ func mutateIf0(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 	return s.List{MkAtom("if0"), mp, mzero, mnonZero}, r3
 }
 
-
-
 func mutateLambda(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
-  largs := l[1].(s.List)
+	largs := l[1].(s.List)
 	arg1 := string(largs[0].(s.Atom).Value)
-  extendedVars := append(vars, arg1)
-  if len(largs) == 2 {
-    arg2 := string(largs[1].(s.Atom).Value)
-    extendedVars = append(extendedVars, arg2)
-  }
+	extendedVars := append(vars, arg1)
+	if len(largs) == 2 {
+		arg2 := string(largs[1].(s.Atom).Value)
+		extendedVars = append(extendedVars, arg2)
+	}
 	body := l[2]
-  mbody, r :=  mutateAt(body, where, m, extendedVars)
-  return s.List{ MkAtom("lambda"), largs, mbody }, r
+	mbody, r := mutateAt(body, where, m, extendedVars)
+	return s.List{MkAtom("lambda"), largs, mbody}, r
 }
 
 func mutateFold(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
@@ -151,6 +151,6 @@ func mutateFold(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 	lambda := l[3].(s.List)
 	mvec, r1 := mutateAt(vec, where, m, vars)
 	mstart, r2 := mutateAt(start, r1, m, vars)
-  mlambda, r3 := mutateAt(lambda, r2, m, vars)
-  return s.List{ MkAtom("fold"), mvec, mstart, mlambda }, r3
+	mlambda, r3 := mutateAt(lambda, r2, m, vars)
+	return s.List{MkAtom("fold"), mvec, mstart, mlambda}, r3
 }

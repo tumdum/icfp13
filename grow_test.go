@@ -27,6 +27,7 @@ func TestCountAllMutationPoints(t *testing.T) {
 		{"(if0 (or a b) (not c) (plus (and d e) f))", 6},
 		{"(fold v s (lambda (x y) e))", 3},
 		{"(fold (not 1) (or x y) (lambda (a b) (plus a (and 0 1))))", 6},
+		{"(lambda (x) (and x x))", 2},
 	}
 
 	for _, d := range data {
@@ -61,7 +62,7 @@ func TestMutateAt(t *testing.T) {
 		{"(fold r 0 (lambda (a b) (plus a b)))", 2, "(fold r M (lambda (a b) (plus a b)))"},
 		{"(fold x y (lambda (a b) (plus a b)))", 3, "(fold x y (lambda (a b) (plus M b)))"},
 		{"(fold x y (lambda (a b) (plus a b)))", 4, "(fold x y (lambda (a b) (plus a M)))"},
-    {"(lambda (x) (and x x))", 1, "(lambda (x) (and M x))"},
+		{"(lambda (x) (and x x))", 1, "(lambda (x) (and M x))"},
 	}
 
 	f := func(e s.Sexp, vars []string) s.Sexp {
