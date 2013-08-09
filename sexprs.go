@@ -37,6 +37,7 @@ func evalList(l sexprs.List, input Env) uint64 {
     case "xor": return evalXor(l[1], l[2], input)
     case "plus": return evalPlus(l[1], l[2], input)
     case "not": return evalNot(l[1], input)
+    case "if0": return evalIf0(l[1], l[2], l[3], input)
     default:
       return 52
   }
@@ -68,6 +69,15 @@ func evalPlus(e1, e2 sexprs.Sexp, input Env) uint64 {
 
 func evalNot(e sexprs.Sexp, input Env) uint64 {
   return ^Eval(e, input)
+}
+
+func evalIf0(p, zero, nonZero sexprs.Sexp, input Env) uint64 {
+  pv := Eval(p, input)
+  if pv == 0 {
+    return Eval(zero, input)
+  } else {
+    return Eval(nonZero, input)
+  }
 }
 
 func evalAtom(e sexprs.Atom, input Env) uint64 {

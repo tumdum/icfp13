@@ -63,3 +63,22 @@ func TestEvalOp1(t *testing.T) {
     }
   }
 }
+
+func TestEvalIf0(t *testing.T) {
+  data := []struct {
+    in string
+    env Env
+    out uint64
+  } {
+    { "(if0 0 0 1)", make(Env), 0 },
+    { "(if0 1 0 1)", make(Env), 1 },
+    { "(if0 x y z)", Env{"x":0,"y":100,"z":200}, 100},
+  }
+
+  for _, d := range data {
+    s := Parse([]byte(d.in))
+    if r := Eval(s, d.env); r != d.out {
+      t.Errorf("expected %v, got '%v'", d.out, r)
+    }
+  }
+}
