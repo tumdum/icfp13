@@ -47,6 +47,8 @@ func evalList(l sexprs.List, input Env) uint64 {
 		return evalIf0(l[1], l[2], l[3], input)
 	case "lambda":
 		return evalLambda(l[1], l[2], input)
+	case "fold":
+		return evalFold(l[1], l[2], l[3], input)
 	default:
 		panic("unknown list head: " + head)
 	}
@@ -98,6 +100,25 @@ func evalLambda(params, body sexprs.Sexp, input Env) uint64 {
 	p2v := input[p2]
 	*/
 	return Eval(body, input)
+}
+
+func evalFold(vec, start, lambda sexprs.Sexp, input Env) uint64 {
+	vecv := Eval(vec, input)
+	acc := Eval(start, input)
+	for i := 7; i >= 0; i-- {
+		left := (vecv << uint((7-i)*8)) >> uint(7*8)
+		localEnv := make(Env)
+		for k, v := range input {
+			localEnv[k] = v
+		}
+		lparams := lambda.(sexprs.List)[1].(sexprs.List)
+		x := string(lparams[0].(sexprs.Atom).Value)
+		y := string(lparams[1].(sexprs.Atom).Value)
+		localEnv[x] = left
+		localEnv[y] = acc
+		acc = Eval(lambda, localEnv)
+	}
+	return acc
 }
 
 func evalAtom(e sexprs.Atom, input Env) uint64 {
