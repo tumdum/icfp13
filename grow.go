@@ -95,10 +95,10 @@ func mutateList(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 		return mutateOp1(l, where, m, vars)
 	case "or", "and", "xor", "plus":
 		return mutateOp2(l, where, m, vars)
-  case "if0":
-    return mutateIf0(l, where, m, vars)
-  case "fold":
-    return mutateFold(l, where, m, vars)
+	case "if0":
+		return mutateIf0(l, where, m, vars)
+	case "fold":
+		return mutateFold(l, where, m, vars)
 	default:
 		panic("mutate list with unknown head: " + head)
 	}
@@ -119,26 +119,26 @@ func mutateOp2(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 }
 
 func mutateIf0(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
-  p := l[1]
-  zero := l[2]
-  nonZero := l[3]
-  mp, r1 := mutateAt(p, where, m, vars)
-  mzero, r2 := mutateAt(zero, r1, m, vars)
-  mnonZero, r3 := mutateAt(nonZero, r2, m, vars)
-  return s.List{ MkAtom("if0"), mp, mzero, mnonZero }, r3
+	p := l[1]
+	zero := l[2]
+	nonZero := l[3]
+	mp, r1 := mutateAt(p, where, m, vars)
+	mzero, r2 := mutateAt(zero, r1, m, vars)
+	mnonZero, r3 := mutateAt(nonZero, r2, m, vars)
+	return s.List{MkAtom("if0"), mp, mzero, mnonZero}, r3
 }
 
 func mutateFold(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
-  vec := l[1]
-  start := l[2]
-  lambda := l[3].(s.List)
-  largs := lambda[1].(s.List)
-  arg1 := string(largs[0].(s.Atom).Value)
-  arg2 := string(largs[1].(s.Atom).Value)
-  body := lambda[2]
-  mvec, r1 := mutateAt(vec, where, m, vars)
-  mstart, r2 := mutateAt(start, r1, m, vars)
-  extendedVars := append(vars,arg1,arg2)
-  mbody, r3 := mutateAt(body, r2, m, extendedVars)
-  return s.List{ MkAtom("fold"), mvec, mstart, s.List{ MkAtom("lambda"), largs, mbody } }, r3
+	vec := l[1]
+	start := l[2]
+	lambda := l[3].(s.List)
+	largs := lambda[1].(s.List)
+	arg1 := string(largs[0].(s.Atom).Value)
+	arg2 := string(largs[1].(s.Atom).Value)
+	body := lambda[2]
+	mvec, r1 := mutateAt(vec, where, m, vars)
+	mstart, r2 := mutateAt(start, r1, m, vars)
+	extendedVars := append(vars, arg1, arg2)
+	mbody, r3 := mutateAt(body, r2, m, extendedVars)
+	return s.List{MkAtom("fold"), mvec, mstart, s.List{MkAtom("lambda"), largs, mbody}}, r3
 }

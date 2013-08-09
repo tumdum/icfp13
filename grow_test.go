@@ -54,13 +54,13 @@ func TestMutateAt(t *testing.T) {
 		{"(not (or a b))", 2, "(not (or a M))"},
 		{"(or (or a b) (or b c))", 4, "(or (or a b) (or b M))"},
 		{"(or (plus x 0) (xor b c))", 2, "(or (plus x M) (xor b c))"},
-    {"(if0 a b c)", 1, "(if0 M b c)" },
-    {"(if0 a b c)", 2, "(if0 a M c)" },
-    {"(if0 a b c)", 3, "(if0 a b M)" },
-    {"(fold 0 r (lambda (a b) (plus a b)))", 1, "(fold M r (lambda (a b) (plus a b)))"},
-    {"(fold r 0 (lambda (a b) (plus a b)))", 2, "(fold r M (lambda (a b) (plus a b)))"},
-    {"(fold x y (lambda (a b) (plus a b)))", 3, "(fold x y (lambda (a b) (plus M b)))"},
-    {"(fold x y (lambda (a b) (plus a b)))", 4, "(fold x y (lambda (a b) (plus a M)))"},
+		{"(if0 a b c)", 1, "(if0 M b c)"},
+		{"(if0 a b c)", 2, "(if0 a M c)"},
+		{"(if0 a b c)", 3, "(if0 a b M)"},
+		{"(fold 0 r (lambda (a b) (plus a b)))", 1, "(fold M r (lambda (a b) (plus a b)))"},
+		{"(fold r 0 (lambda (a b) (plus a b)))", 2, "(fold r M (lambda (a b) (plus a b)))"},
+		{"(fold x y (lambda (a b) (plus a b)))", 3, "(fold x y (lambda (a b) (plus M b)))"},
+		{"(fold x y (lambda (a b) (plus a b)))", 4, "(fold x y (lambda (a b) (plus a M)))"},
 	}
 
 	f := func(e s.Sexp, vars []string) s.Sexp {
