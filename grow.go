@@ -17,11 +17,6 @@ func Uint32n(n int) uint32 {
 	return rand.Uint32() % uint32(n)
 }
 
-func GenVar(vars []string) s.Sexp {
-	i := Uint32n(len(vars))
-	return MkAtom(vars[i])
-}
-
 func CountMutationPoints(e s.Sexp) int {
 	switch e := e.(type) {
 	case s.List:
@@ -71,7 +66,10 @@ func (v Vars) Add(name string) Vars {
 
 func MutateAt(e s.Sexp, where int, m Mutator) (s.Sexp, error) {
 	// fmt.Println("---------")
-	me, n := mutateAt(e, where, m, make(Vars))
+	v := make(Vars)
+	v["__0"] = true
+	v["__1"] = true
+	me, n := mutateAt(e, where, m, v)
 	if n != 0 {
 		return nil, errors.New("failed to mutate")
 	}
