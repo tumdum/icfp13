@@ -65,7 +65,7 @@ func TestMutateAt(t *testing.T) {
 		{"(lambda (x) (and x x))", 1, "(lambda (x) (and M x))"},
 	}
 
-	f := func(e s.Sexp, vars []string) s.Sexp {
+	f := func(e s.Sexp, vars Vars) s.Sexp {
 		return MkAtom("M")
 	}
 
