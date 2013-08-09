@@ -117,3 +117,21 @@ func TestEvalFold(t *testing.T) {
 		}
 	}
 }
+
+func TestEvalProgram(t *testing.T) {
+	data := []struct {
+		in  string
+		env Env
+		out uint64
+	}{
+		{"(lambda (x) (fold x 0 (lambda (y z) (or y z))))", Env{"x": 0x1122334455667788}, 0xff},
+		{"(lambda (x) (plus 1 1))", make(Env), 2},
+	}
+
+	for _, d := range data {
+		s := Parse([]byte(d.in))
+		if r := Eval(s, d.env); r != d.out {
+			t.Errorf("expected %v, got '%v'", d.out, r)
+		}
+	}
+}
