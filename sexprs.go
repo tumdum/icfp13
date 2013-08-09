@@ -45,8 +45,10 @@ func evalList(l sexprs.List, input Env) uint64 {
 		return evalNot(l[1], input)
 	case "if0":
 		return evalIf0(l[1], l[2], l[3], input)
+	case "lambda":
+		return evalLambda(l[1], l[2], input)
 	default:
-		return 52
+		panic("unknown list head: " + head)
 	}
 }
 
@@ -85,6 +87,17 @@ func evalIf0(p, zero, nonZero sexprs.Sexp, input Env) uint64 {
 	} else {
 		return Eval(nonZero, input)
 	}
+}
+
+func evalLambda(params, body sexprs.Sexp, input Env) uint64 {
+	/* p1 and p2 should already be in input!
+	pList := params.(sexprs.List)
+	p1 := string(pList[0].(sexprs.Atom).Value)
+	p2 := string(pList[1].(sexprs.Atom).Value)
+	p1v := input[p1]
+	p2v := input[p2]
+	*/
+	return Eval(body, input)
 }
 
 func evalAtom(e sexprs.Atom, input Env) uint64 {

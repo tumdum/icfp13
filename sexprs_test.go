@@ -82,3 +82,21 @@ func TestEvalIf0(t *testing.T) {
 		}
 	}
 }
+
+func TestEvalLambda(t *testing.T) {
+	data := []struct {
+		in  string
+		env Env
+		out uint64
+	}{
+		{"(lambda (x y) (plus x y))", Env{"x": 100, "y": 50}, 150},
+		{"(lambda (x y) (plus (plus x x) y))", Env{"x": 100, "y": 3}, 203},
+	}
+
+	for _, d := range data {
+		s := Parse([]byte(d.in))
+		if r := Eval(s, d.env); r != d.out {
+			t.Errorf("expected %v, got '%v'", d.out, r)
+		}
+	}
+}
