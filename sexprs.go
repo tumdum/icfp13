@@ -6,10 +6,17 @@ import (
 )
 type Env map[string]uint64
 
-func Parse(input []byte) (sexprs.Sexp, []byte, error) {
+func Parse(input []byte) sexprs.Sexp {
   input = bytes.Replace(input, []byte(" 0"), []byte(" __0"), -1)
   input = bytes.Replace(input, []byte(" 1"), []byte(" __1"), -1)
-  return sexprs.Parse(input)
+  s, r, e := sexprs.Parse(input)
+  if len(r) != 0 {
+    panic("rest not empty: " + string(r))
+  }
+  if e != nil {
+    panic("failed to parse")
+  }
+  return s
 }
 
 func Eval(e sexprs.Sexp, input Env) uint64 {
@@ -29,6 +36,7 @@ func evalList(l sexprs.List, input Env) uint64 {
     case "and": return evalAnd(l[1], l[2], input)
     case "xor": return evalXor(l[1], l[2], input)
     case "plus": return evalPlus(l[1], l[2], input)
+    case "not": return evalNot(l[1], input)
     default:
       return 52
   }
@@ -56,6 +64,10 @@ func evalPlus(e1, e2 sexprs.Sexp, input Env) uint64 {
   e1v := Eval(e1, input)
   e2v := Eval(e2, input)
   return e1v + e2v
+}
+
+func evalNot(e sexprs.Sexp, input Env) uint64 {
+  return ^Eval(e, input)
 }
 
 func evalAtom(e sexprs.Atom, input Env) uint64 {

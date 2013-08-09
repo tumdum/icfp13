@@ -23,7 +23,7 @@ func TestEvalOp2(t *testing.T) {
     { "(plus 1 (plus 1 1))", 3},
   }
   for _,d := range data {
-    s, _, _ := Parse([]byte(d.input))
+    s := Parse([]byte(d.input))
     if r := Eval(s, make(Env)); r != d.output {
       t.Errorf("expected %v, got '%v'", d.output, r)
     }
@@ -36,13 +36,29 @@ func TestEvalId(t *testing.T) {
     env  Env
     out  uint64
   } {
-    { "x", Env{"x":43}, 43},
     { "(plus x y)", Env{"x":55,"y":45}, 100},
   }
 
   for _, d := range data {
-    s, _, _ := Parse([]byte(d.expr))
+    s := Parse([]byte(d.expr))
     if r := Eval(s, d.env); r != d.out {
+      t.Errorf("expected %v, got '%v'", d.out, r)
+    }
+  }
+}
+
+func TestEvalOp1(t *testing.T) {
+  data := []struct {
+    in string
+    out uint64
+  } {
+    { "(not 0)", 0xffffffffffffffff },
+    { "(not (not 0))", 0 },
+    { "(not (not 1))", 1 },
+  }
+  for _, d := range data {
+    s := Parse([]byte(d.in))
+    if r := Eval(s, make(Env)); r != d.out {
       t.Errorf("expected %v, got '%v'", d.out, r)
     }
   }
