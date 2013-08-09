@@ -54,6 +54,9 @@ func TestMutateAt(t *testing.T) {
 		{"(not (or a b))", 2, "(not (or a M))"},
 		{"(or (or a b) (or b c))", 4, "(or (or a b) (or b M))"},
 		{"(or (plus x 0) (xor b c))", 2, "(or (plus x M) (xor b c))"},
+    {"(if0 a b c)", 1, "(if0 M b c)" },
+    {"(if0 a b c)", 2, "(if0 a M c)" },
+    {"(if0 a b c)", 3, "(if0 a b M)" },
 	}
 
 	f := func(e s.Sexp) s.Sexp {

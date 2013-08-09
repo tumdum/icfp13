@@ -95,6 +95,8 @@ func mutateList(l s.List, where int, m Mutator) (s.Sexp, int) {
 		return mutateOp1(l, where, m)
 	case "or", "and", "xor", "plus":
 		return mutateOp2(l, where, m)
+  case "if0":
+    return mutateIf0(l, where, m)
 	default:
 		panic("mutate list with unknown head: " + head)
 	}
@@ -112,10 +114,14 @@ func mutateOp2(l s.List, where int, m Mutator) (s.Sexp, int) {
 	ml2, r2 := mutateAt(l[2], r1, m)
 	//fmt.Println("ml1:", ml1, "ml2:", ml2, "r2:", r2)
 	return s.List{MkAtom(head), ml1, ml2}, r2
-	/*if where == 1 {
-	    return s.List{ MkAtom(head), m(l[1]), l[2] }, 0
-	  } else if where == 2 {
-	    return s.List{ MkAtom(head), l[1], m(l[2]) }, 0
-	  }
-	  return s.List{ MkAtom(head), l[1], l[2] }, where*/
+}
+
+func mutateIf0(l s.List, where int, m Mutator) (s.Sexp, int) {
+  p := l[1]
+  zero := l[2]
+  nonZero := l[3]
+  mp, r1 := mutateAt(p, where, m)
+  mzero, r2 := mutateAt(zero, r1, m)
+  mnonZero, r3 := mutateAt(nonZero, r2, m)
+  return s.List{ MkAtom("if0"), mp, mzero, mnonZero }, r3
 }
