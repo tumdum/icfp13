@@ -61,6 +61,7 @@ func TestMutateAt(t *testing.T) {
 		{"(fold r 0 (lambda (a b) (plus a b)))", 2, "(fold r M (lambda (a b) (plus a b)))"},
 		{"(fold x y (lambda (a b) (plus a b)))", 3, "(fold x y (lambda (a b) (plus M b)))"},
 		{"(fold x y (lambda (a b) (plus a b)))", 4, "(fold x y (lambda (a b) (plus a M)))"},
+    {"(lambda (x) (and x x))", 1, "(lambda (x) (and M x))"},
 	}
 
 	f := func(e s.Sexp, vars []string) s.Sexp {

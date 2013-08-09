@@ -97,6 +97,8 @@ func mutateList(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 		return mutateOp2(l, where, m, vars)
 	case "if0":
 		return mutateIf0(l, where, m, vars)
+  case "lambda":
+    return mutateLambda(l, where, m, vars)
 	case "fold":
 		return mutateFold(l, where, m, vars)
 	default:
@@ -128,17 +130,27 @@ func mutateIf0(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 	return s.List{MkAtom("if0"), mp, mzero, mnonZero}, r3
 }
 
+
+
+func mutateLambda(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
+  largs := l[1].(s.List)
+	arg1 := string(largs[0].(s.Atom).Value)
+  extendedVars := append(vars, arg1)
+  if len(largs) == 2 {
+    arg2 := string(largs[1].(s.Atom).Value)
+    extendedVars = append(extendedVars, arg2)
+  }
+	body := l[2]
+  mbody, r :=  mutateAt(body, where, m, extendedVars)
+  return s.List{ MkAtom("lambda"), largs, mbody }, r
+}
+
 func mutateFold(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 	vec := l[1]
 	start := l[2]
 	lambda := l[3].(s.List)
-	largs := lambda[1].(s.List)
-	arg1 := string(largs[0].(s.Atom).Value)
-	arg2 := string(largs[1].(s.Atom).Value)
-	body := lambda[2]
 	mvec, r1 := mutateAt(vec, where, m, vars)
 	mstart, r2 := mutateAt(start, r1, m, vars)
-	extendedVars := append(vars, arg1, arg2)
-	mbody, r3 := mutateAt(body, r2, m, extendedVars)
-	return s.List{MkAtom("fold"), mvec, mstart, s.List{MkAtom("lambda"), largs, mbody}}, r3
+  mlambda, r3 := mutateAt(lambda, r2, m, vars)
+  return s.List{ MkAtom("fold"), mvec, mstart, mlambda }, r3
 }
