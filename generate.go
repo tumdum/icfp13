@@ -22,7 +22,7 @@ func GenVar(v Vars, n int) string {
 func GenNewVar(v Vars) string {
 	const prefix = "a__"
 	for {
-		n := rand.Int()
+		n := len(v)
 		name := prefix + strconv.Itoa(n)
 		if !v[name] {
 			return name
