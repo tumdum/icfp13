@@ -59,7 +59,7 @@ func TestMutateAt(t *testing.T) {
     {"(if0 a b c)", 3, "(if0 a b M)" },
 	}
 
-	f := func(e s.Sexp) s.Sexp {
+	f := func(e s.Sexp, vars []string) s.Sexp {
 		return MkAtom("M")
 	}
 

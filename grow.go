@@ -55,32 +55,32 @@ func countMutationPointsInFold(vec, start, lambda s.Sexp) int {
 	return CountMutationPoints(vec) + CountMutationPoints(start) + CountMutationPoints(lbody)
 }
 
-type Mutator func(s.Sexp) s.Sexp
+type Mutator func(s.Sexp, []string) s.Sexp
 
 func MutateAt(e s.Sexp, where int, m Mutator) (s.Sexp, error) {
 	// fmt.Println("---------")
-	me, n := mutateAt(e, where, m)
+	me, n := mutateAt(e, where, m, []string{})
 	if n != 0 {
 		return nil, errors.New("failed to mutate")
 	}
 	return me, nil
 }
 
-func mutateAt(e s.Sexp, where int, m Mutator) (s.Sexp, int) {
+func mutateAt(e s.Sexp, where int, m Mutator, vars []string) (s.Sexp, int) {
 	switch e := e.(type) {
 	case s.List:
-		return mutateList(e, where, m)
+		return mutateList(e, where, m, vars)
 	case s.Atom:
-		return mutateAtom(e, where, m)
+		return mutateAtom(e, where, m, vars)
 	default:
 		panic("mutate unknown type")
 	}
 }
 
-func mutateAtom(a s.Atom, where int, m Mutator) (s.Sexp, int) {
+func mutateAtom(a s.Atom, where int, m Mutator, vars []string) (s.Sexp, int) {
 	// fmt.Println("mutateAtom", a, where)
 	if where == 1 {
-		return m(a), 0
+		return m(a, vars), 0
 	}
 	if where > 0 {
 		where--
@@ -88,40 +88,40 @@ func mutateAtom(a s.Atom, where int, m Mutator) (s.Sexp, int) {
 	return MkAtom(string(a.Value)), where
 }
 
-func mutateList(l s.List, where int, m Mutator) (s.Sexp, int) {
+func mutateList(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 	head := string(l[0].(s.Atom).Value)
 	switch head {
 	case "not", "shl1", "shr1", "shr4", "shr16":
-		return mutateOp1(l, where, m)
+		return mutateOp1(l, where, m, vars)
 	case "or", "and", "xor", "plus":
-		return mutateOp2(l, where, m)
+		return mutateOp2(l, where, m, vars)
   case "if0":
-    return mutateIf0(l, where, m)
+    return mutateIf0(l, where, m, vars)
 	default:
 		panic("mutate list with unknown head: " + head)
 	}
 }
 
-func mutateOp1(l s.List, where int, m Mutator) (s.Sexp, int) {
+func mutateOp1(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 	head := string(l[0].(s.Atom).Value)
-	ml1, r := mutateAt(l[1], where, m)
+	ml1, r := mutateAt(l[1], where, m, vars)
 	return s.List{MkAtom(head), ml1}, r
 }
 
-func mutateOp2(l s.List, where int, m Mutator) (s.Sexp, int) {
+func mutateOp2(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
 	head := string(l[0].(s.Atom).Value)
-	ml1, r1 := mutateAt(l[1], where, m)
-	ml2, r2 := mutateAt(l[2], r1, m)
+	ml1, r1 := mutateAt(l[1], where, m, vars)
+	ml2, r2 := mutateAt(l[2], r1, m, vars)
 	//fmt.Println("ml1:", ml1, "ml2:", ml2, "r2:", r2)
 	return s.List{MkAtom(head), ml1, ml2}, r2
 }
 
-func mutateIf0(l s.List, where int, m Mutator) (s.Sexp, int) {
+func mutateIf0(l s.List, where int, m Mutator, vars []string) (s.Sexp, int) {
   p := l[1]
   zero := l[2]
   nonZero := l[3]
-  mp, r1 := mutateAt(p, where, m)
-  mzero, r2 := mutateAt(zero, r1, m)
-  mnonZero, r3 := mutateAt(nonZero, r2, m)
+  mp, r1 := mutateAt(p, where, m, vars)
+  mzero, r2 := mutateAt(zero, r1, m, vars)
+  mnonZero, r3 := mutateAt(nonZero, r2, m, vars)
   return s.List{ MkAtom("if0"), mp, mzero, mnonZero }, r3
 }
