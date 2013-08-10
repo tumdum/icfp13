@@ -9,6 +9,7 @@ import (
 
 const StartSexp = "(lambda (x) x)"
 const Percent = 0.7
+const MaxGenerationSize = 1000
 
 type Constraint struct {
   in, out uint64
@@ -33,6 +34,10 @@ func GenConstrains(e s.Sexp, s int) []Constraint {
 func TakeBestPercent(percent float32, sols Solutions) Solutions {
   l := sols.Len()
   prefixSize := int(percent * float32(l)) + 1
+  if prefixSize > MaxGenerationSize && sols[0].score > 0 {
+    fmt.Println("trim!")
+    prefixSize = MaxGenerationSize
+  }
   return sols[:prefixSize]
 }
 
