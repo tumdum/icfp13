@@ -6,6 +6,34 @@ import (
 	"strconv"
 )
 
+const NewGenerationSize = 1000
+
+func GenNewRandomUniqGeneration(start s.Sexp) []s.Sexp {
+	muts := CountMutationPoints(start)
+	ret := make([]s.Sexp, 0, NewGenerationSize)
+	seen := make(map[string]bool)
+
+	fails := 0
+	for (len(ret) < NewGenerationSize) && (fails < NewGenerationSize) {
+		mpoint := rand.Intn(muts) + 1
+		mutation, err := MutateAt(start, mpoint, GenSexp)
+		if err != nil {
+			fails++
+			continue
+		}
+		mstr := mutation.String()
+		if seen[mstr] {
+			fails++
+			continue
+		} else {
+			ret = append(ret, mutation)
+			seen[mstr] = true
+		}
+	}
+
+	return ret
+}
+
 func GenVar(v Vars, n int) string {
 	i := 0
 	for k, v := range v {
