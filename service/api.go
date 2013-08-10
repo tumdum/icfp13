@@ -35,6 +35,14 @@ type EvalResponse struct {
 	Message string
 }
 
+type Problem struct {
+    Id string
+    Size int
+    Operators []string
+    Solved bool
+    TimeLeft int
+}
+
 func request(kind string, body []byte) ([]byte, error) {
 	resp, err := http.Post(service+kind+"?auth="+auth, "text/plain", bytes.NewReader(body))
 	if err != nil {

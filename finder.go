@@ -98,6 +98,15 @@ func GenSize(iterNumber int) int {
 	return NewGenerationSize
 }
 
+func HasTfold(ops []string) bool {
+	for _, op := range ops {
+		if op == "tfold" {
+			return true
+		}
+	}
+	return false
+}
+
 func FindProgramPar(constraints []Constraint, ops []string, size int) {
 	req := make(chan NextGenReq)
 	out := make(chan Solutions)
@@ -108,7 +117,12 @@ func FindProgramPar(constraints []Constraint, ops []string, size int) {
 	go Generator(req, out, stop, NewGenerationSize)
 	go Generator(req, out, stop, NewGenerationSize)
 
-	start := Parse([]byte(StartSexp))
+	var start s.Sexp
+	if HasTfold(ops) {
+		start = Parse([]byte("(lambda (const_x) (fold const_x const_0 (lambda (const_x y) e)))"))
+	} else {
+		start = Parse([]byte(StartSexp))
+	}
 	sols := NextGeneration(start, constraints, ops, NewGenerationSize)
 	i := 0
 	lastBestScore := 0.0

@@ -23,6 +23,5 @@ func main() {
   run("(lambda (x_7942) (if0 (and (and x_7942 1) 1) 0 x_7942))", []string{"and","if0"},9) // size 9
   run("(lambda (x_11238) (shr1 (if0 (or (shr1 x_11238) 1) (shr1 (not x_11238)) x_11238)))", []string{"if0", "not", "or", "shr1"},11) // size 11
   run("(lambda (x_17733) (xor (not (shr1 (plus (if0 (shr1 (xor (not x_17733) 0)) x_17733 1) x_17733))) x_17733))", []string{ "if0", "not", "plus", "shr1", "xor" },15) // size 15
-  // long:
   run("(lambda (x_9921) (fold x_9921 0 (lambda (x_9921 x_9922) (or (xor (shr1 x_9921) 0) 1))))", []string{"or", "shr1", "tfold", "xor" }, 11)
 }

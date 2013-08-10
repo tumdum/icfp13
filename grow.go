@@ -5,6 +5,7 @@ import (
 	// "fmt"
 	"errors"
 	s "github.com/eadmund/sexprs"
+	"strings"
 )
 
 const StartingSexp = "(lambda (x) x)"
@@ -89,6 +90,10 @@ func mutateAt(e s.Sexp, where int, m Mutator, vars Vars) (s.Sexp, int) {
 
 func mutateAtom(a s.Atom, where int, m Mutator, vars Vars) (s.Sexp, int) {
 	// fmt.Println("mutateAtom", a, where)
+	aname := string(a.Value)
+	if strings.HasPrefix(aname, "const_") {
+		return a, where
+	}
 	if where == 1 {
 		return m(a, vars), 0
 	}
