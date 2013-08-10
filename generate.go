@@ -9,11 +9,11 @@ import (
 const NewGenerationSize = 300
 
 func GenNewRandomUniqGeneration(start s.Sexp) []s.Sexp {
-  return genNewRandomUniqGeneration(start, GenSexp)
+	return genNewRandomUniqGeneration(start, GenSexp)
 }
 
 func GenNewRandomUniqGenerationUsing(start s.Sexp, ops []string) []s.Sexp {
-  return genNewRandomUniqGeneration(start, MetaMutator2(ops))
+	return genNewRandomUniqGeneration(start, MetaMutator2(ops))
 }
 
 func genNewRandomUniqGeneration(start s.Sexp, m Mutator) []s.Sexp {
@@ -67,50 +67,48 @@ func GenNewVar(v Vars) string {
 }
 
 func RandMut(ops []Mutator) Mutator {
-  return ops[ rand.Intn(len(ops)) ]
+	return ops[rand.Intn(len(ops))]
 }
 
 func MetaMutator2(ops []string) Mutator {
-  m := make(map[string]Mutator)
-  m["not"] = MetaOp1Named("not")
-  m["shl1"] = MetaOp1Named("shl1")
-  m["shr1"] = MetaOp1Named("shr1")
-  m["shr4"] = MetaOp1Named("shr4")
-  m["shr16"] = MetaOp1Named("shr16")
-  m["and"] = MetaOp2Named("and")
-  m["or"] = MetaOp2Named("or")
-  m["xor"] = MetaOp2Named("xor")
-  m["plus"] = MetaOp2Named("plus")
-  m["if0"] = GenIf0
-  m["fold"] = GenFold
-  m["tfold"] = GenFold
+	m := make(map[string]Mutator)
+	m["not"] = MetaOp1Named("not")
+	m["shl1"] = MetaOp1Named("shl1")
+	m["shr1"] = MetaOp1Named("shr1")
+	m["shr4"] = MetaOp1Named("shr4")
+	m["shr16"] = MetaOp1Named("shr16")
+	m["and"] = MetaOp2Named("and")
+	m["or"] = MetaOp2Named("or")
+	m["xor"] = MetaOp2Named("xor")
+	m["plus"] = MetaOp2Named("plus")
+	m["if0"] = GenIf0
+	m["fold"] = GenFold
+	m["tfold"] = GenFold
 
-  selected := make([]Mutator,0)
-  for _, op := range ops {
-    if v, ok := m[op]; ok {
-      selected = append(selected, v)
-    }
-  }
-  return func(e s.Sexp, v Vars) s.Sexp {
-    return RandMut(selected)(e, v)
-  }
+	selected := make([]Mutator, 0)
+	for _, op := range ops {
+		if v, ok := m[op]; ok {
+			selected = append(selected, v)
+		}
+	}
+	return func(e s.Sexp, v Vars) s.Sexp {
+		return RandMut(selected)(e, v)
+	}
 }
 
-
-
 func MetaMutator(ops []string) Mutator {
-  muts := []Mutator{ GenAtom, GenOp1s, GenOp2s, GenIf0 }
-  if len(ops) > 0 {
-    muts = append(muts, GenFold)
-  }
-  return func(e s.Sexp, v Vars) s.Sexp {
-    return RandMut(muts)(e, v)
-  }
+	muts := []Mutator{GenAtom, GenOp1s, GenOp2s, GenIf0}
+	if len(ops) > 0 {
+		muts = append(muts, GenFold)
+	}
+	return func(e s.Sexp, v Vars) s.Sexp {
+		return RandMut(muts)(e, v)
+	}
 }
 
 func GenSexp(e s.Sexp, v Vars) s.Sexp {
 	muts := []Mutator{GenAtom, GenOp1s, GenOp2s, GenIf0, GenFold}
-  return RandMut(muts)(e, v)
+	return RandMut(muts)(e, v)
 }
 
 func GenAtom(e s.Sexp, v Vars) s.Sexp {
@@ -118,15 +116,15 @@ func GenAtom(e s.Sexp, v Vars) s.Sexp {
 	for {
 		i := Uint32n(l)
 		n := GenVar(v, int(i))
-    return MkAtom(n)
+		return MkAtom(n)
 	}
 }
 
 func MetaOp1Named(op string) Mutator {
-  return func(e s.Sexp, v Vars) s.Sexp {
-    body := GenAtom(e, v)
-    return s.List{ MkAtom(op), body }
-  }
+	return func(e s.Sexp, v Vars) s.Sexp {
+		body := GenAtom(e, v)
+		return s.List{MkAtom(op), body}
+	}
 }
 
 func GenOp1s(e s.Sexp, v Vars) s.Sexp {
@@ -138,11 +136,11 @@ func GenOp1s(e s.Sexp, v Vars) s.Sexp {
 }
 
 func MetaOp2Named(op string) Mutator {
-  return func(e s.Sexp, v Vars) s.Sexp {
-    l := GenAtom(e, v)
-    r := GenAtom(e, v)
-    return s.List{ MkAtom(op), l, r }
-  }
+	return func(e s.Sexp, v Vars) s.Sexp {
+		l := GenAtom(e, v)
+		r := GenAtom(e, v)
+		return s.List{MkAtom(op), l, r}
+	}
 }
 
 func GenOp2s(e s.Sexp, v Vars) s.Sexp {
