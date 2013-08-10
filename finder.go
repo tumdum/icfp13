@@ -9,7 +9,7 @@ import (
 
 const StartSexp = "(lambda (x) x)"
 const Percent = 0.7
-const MaxGenerationSize = 1000
+const MaxGenerationSize = 20000
 
 type Constraint struct {
 	in, out uint64
@@ -39,6 +39,80 @@ func TakeBestPercent(percent float32, sols Solutions) Solutions {
 		prefixSize = MaxGenerationSize
 	}
 	return sols[:prefixSize]
+}
+
+type NextGenReq struct {
+	start       s.Sexp
+	constraints []Constraint
+	ops         []string
+}
+
+func Generator(reqs chan NextGenReq, out chan Solutions, stop chan bool) {
+	for {
+		select {
+		case req := <-reqs:
+			s := NextGeneration(req.start, req.constraints, req.ops)
+			out <- s
+		case <-stop:
+			break
+		}
+	}
+}
+
+func CollectResults(out chan Solutions, count int, ret chan Solutions) {
+	newsols := make(Solutions, 0)
+	for i := 0; i < count; i++ {
+		newsols = append(newsols, <-out...)
+	}
+	ret <- newsols
+}
+
+func FindProgramPar(constraints []Constraint, ops []string) {
+	req := make(chan NextGenReq)
+	out := make(chan Solutions)
+	merged := make(chan Solutions)
+	stop := make(chan bool)
+	go Generator(req, out, stop)
+	go Generator(req, out, stop)
+	go Generator(req, out, stop)
+	go Generator(req, out, stop)
+
+	start := Parse([]byte(StartSexp))
+	sols := TakeBestPercent(Percent, NextGeneration(start, constraints, ops))
+	i := 0
+	lastBestScore := 0.0
+	for {
+		fmt.Println("iter:", i, len(sols))
+		newsols := make(Solutions, 0)
+		go CollectResults(out, len(sols), merged)
+		for _, sol := range sols {
+			req <- NextGenReq{sol.prog, constraints, ops}
+		}
+
+		stop <- true
+		stop <- true
+		stop <- true
+		stop <- true
+		newsols = <-merged
+
+		sols = TakeBestPercent(Percent, append(sols, newsols...))
+		sort.Sort(sols)
+		if sols[0].score == 1.0 {
+			fmt.Println("found solution:", sols[0].prog)
+			Score(sols[0].prog, constraints)
+			break
+		} else if sols[0].score > 0.0 {
+			fmt.Println("best score:", sols[0].score)
+			if lastBestScore >= sols[0].score {
+				sols = TakeBestPercent(Percent, NextGeneration(start, constraints, ops))
+				lastBestScore = 0.0
+				i = 0
+			} else {
+				lastBestScore = sols[0].score
+			}
+		}
+		i++
+	}
 }
 
 func FindProgram(constraints []Constraint, ops []string) {

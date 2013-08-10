@@ -2,15 +2,17 @@ package main
 
 import (
   "bitbucket.org/tumdum/icfp13"
+  "runtime"
 )
 
 func run(p string, ops []string) {
   e := icfp13.Parse([]byte(p))
   cons := icfp13.GenConstrains(e, 100)
-  icfp13.FindProgram(cons, ops)
+  icfp13.FindProgramPar(cons, ops)
 }
 
 func main() {
+  runtime.GOMAXPROCS(4)
   p := "(lambda (x) (plus 1 1))"
   run(p,[]string{"plus"})
   run("(lambda (x) (or (plus x 1) (shr4 x)))",[]string{"shr4","plus","or"})
