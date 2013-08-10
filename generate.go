@@ -67,13 +67,10 @@ func GenSexp(e s.Sexp, v Vars) s.Sexp {
 
 func GenAtom(e s.Sexp, v Vars) s.Sexp {
 	l := len(v)
-	aname := string(e.(s.Atom).Value)
 	for {
 		i := Uint32n(l)
 		n := GenVar(v, int(i))
-		if n != aname {
-			return MkAtom(n)
-		}
+    return MkAtom(n)
 	}
 }
 

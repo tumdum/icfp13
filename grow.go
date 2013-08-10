@@ -2,7 +2,7 @@ package icfp13
 
 import (
 	"math/rand"
-	//"fmt"
+	// "fmt"
 	"errors"
 	s "github.com/eadmund/sexprs"
 )

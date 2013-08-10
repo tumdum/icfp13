@@ -64,7 +64,7 @@ func verify(p string) {
 }
 
 func main() {
-	CheckEval(18)
+	CheckEval(30)
   // verify("(lambda (x) (fold x 0 (lambda (x a) (plus x a))))")
 }
 
