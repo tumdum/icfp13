@@ -22,7 +22,8 @@ func Parse(input []byte) sexprs.Sexp {
 
 func EvalProgram(p sexprs.Sexp, input uint64) uint64 {
 	arg := string(p.(sexprs.List)[1].(sexprs.List)[0].(sexprs.Atom).Value)
-	return Eval(p, Env{arg: input})
+	r := Eval(p, Env{arg: input})
+	return r
 }
 
 func Eval(e sexprs.Sexp, input Env) uint64 {

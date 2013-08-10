@@ -260,3 +260,23 @@ func TestFoldFromTraining(t *testing.T) {
 		}
 	}
 }
+
+func TestTFoldTraining(t *testing.T) {
+	data := []struct {
+		p    string
+		ins  []uint64
+		outs []uint64
+	}{
+		{"(lambda (x) (fold x 0 (lambda (x a) (or (plus (shl1 a) 1) x))))", []uint64{0, 1, 0x100, 0x1000, 0x10000, 0x100000, 0x1000000, 0x100000000, 0x1122334455667788}, []uint64{0x00000000000000FF, 0x00000000000000FF, 0x00000000000000FF, 0x00000000000004FF, 0x00000000000000FF, 0x00000000000002FF, 0x00000000000000FF, 0x00000000000000FF, 0x0000000000005FFF}},
+		{"(lambda (x) (fold x 0 (lambda (x a) (plus x a))))", []uint64{0, 1, 0x100, 0x1000, 0x10000, 0x100000, 0x1000000, 0x100000000, 0x1122334455667788}, []uint64{0x0000000000000000, 0x0000000000000001, 0x0000000000000001, 0x0000000000000010, 0x0000000000000001, 0x0000000000000010, 0x0000000000000001, 0x0000000000000001, 0x0000000000000264}},
+	}
+
+	for _, d := range data {
+		e := Parse([]byte(d.p))
+		for idx, in := range d.ins {
+			if r := EvalProgram(e, in); r != d.outs[idx] {
+				t.Errorf("%d: form %X(%d) expected '%X(%d)', got '%X(%d)'", idx, in, in, d.outs[idx], d.outs[idx], r, r)
+			}
+		}
+	}
+}

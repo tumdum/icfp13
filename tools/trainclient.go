@@ -22,7 +22,7 @@ func RandomInput(size int) []string {
 func CheckEval(psize int) {
 	for {
 		ri := RandomInput(255)
-		problem, e := service.Train(service.TrainRequest{psize, []string{"fold"}})
+		problem, e := service.Train(service.TrainRequest{psize, []string{"tfold"}})
 		if e != nil {
 			continue
 		}
@@ -45,8 +45,27 @@ func CheckEval(psize int) {
 	}
 }
 
+func verify(p string) {
+  inputs := []string{}
+  for i := uint64(0); i < 255; i++ {
+    // inputs = append(inputs, "0x" + strconv.FormatUint(i*10, 16))
+    inputs = append(inputs, "0x100")
+  }
+  prog := icfp13.Parse([]byte(p))
+  ereq := service.EvalRequest{"", p, inputs}
+  eresp, _ := service.Eval(ereq)
+  fmt.Println(eresp)
+  for i, val := range eresp.Outputs {
+    in, _ := strconv.ParseUint(inputs[i], 0, 64)
+    progRet := icfp13.EvalProgram(prog, in)
+    out, _ := strconv.ParseUint(val, 0, 64)
+    fmt.Printf("%d: %s => %X <= %X\n", i, inputs[i], out, progRet)
+  }
+}
+
 func main() {
-	CheckEval(11)
+	CheckEval(18)
+  // verify("(lambda (x) (fold x 0 (lambda (x a) (plus x a))))")
 }
 
 func Xmain() {
