@@ -125,12 +125,12 @@ func TestEvalProgram(t *testing.T) {
 		out uint64
 	}{
 		{"(lambda (x) (fold x 0 (lambda (y z) (or y z))))", Env{"x": 0x1122334455667788}, 0xff},
-		{"(lambda (x) (plus 1 1))", make(Env), 2},
+		{"(lambda (x) (plus 1 1))", Env{"x":100}, 2},
 	}
 
 	for _, d := range data {
 		s := Parse([]byte(d.in))
-		if r := Eval(s, d.env); r != d.out {
+		if r := EvalProgram(s, d.env["x"]); r != d.out {
 			t.Errorf("expected %v, got '%v'", d.out, r)
 		}
 	}

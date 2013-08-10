@@ -2,11 +2,13 @@ package icfp13
 
 import (
 	s "github.com/eadmund/sexprs"
-  "fmt"
   "math/rand"
+  "sort"
+  "fmt"
 )
 
 const StartSexp = "(lambda (x) x)"
+const Percent = 0.7
 
 type Constraint struct {
   in, out uint64
@@ -28,13 +30,62 @@ func GenConstrains(e s.Sexp, s int) []Constraint {
   return ret
 }
 
-func FindProgram(constraints []Constraint) {
+func TakeBestPercent(percent float32, sols Solutions) Solutions {
+  l := sols.Len()
+  prefixSize := int(percent * float32(l)) + 1
+  return sols[:prefixSize]
+}
+
+func FindProgram(constraints []Constraint, ops []string) {
   start := Parse([]byte(StartSexp))
-  nextGeneration := GenNewRandomUniqGeneration(start)
+  sols := TakeBestPercent(Percent,NextGeneration(start, constraints,ops))
+  i := 0
+  for {
+    fmt.Println("iter:",i, len(sols))
+    newsols := make(Solutions,0)
+    for _, sol := range sols {
+      newsols = append(newsols, NextGeneration(sol.prog, constraints,ops)...)
+    }
+    sols = TakeBestPercent(Percent,append(sols, newsols...))
+    sort.Sort(sols)
+    if sols[0].score == 1.0 {
+      fmt.Println("found solution:", sols[0].prog)
+      Score(sols[0].prog, constraints)
+      break
+    } else {
+      fmt.Println("best score:", sols[0].score)
+    }
+    i++
+  }
+}
+
+type Solution struct {
+  prog s.Sexp
+  score float64
+}
+
+type Solutions []Solution
+
+func (s Solutions) Len() int {
+  return len(s)
+}
+
+func (s Solutions) Less(i, j int) bool {
+  return s[i].score > s[j].score
+}
+
+func (s Solutions) Swap(i, j int) {
+  s[i], s[j] = s[j], s[i]
+}
+
+func NextGeneration(e s.Sexp, constraints []Constraint, ops []string) Solutions {
+  nextGeneration := GenNewRandomUniqGenerationUsing(e, ops)
+  sols := make([]Solution,0)
   for _, next := range nextGeneration {
     score := Score(next, constraints)
-    fmt.Println(score, next)
+    sols = append(sols, Solution{ next, score })
   }
+  return sols
 }
 
 func Score(e s.Sexp, cons []Constraint) float64 {
