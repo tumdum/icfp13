@@ -238,3 +238,25 @@ func TestEvalShr16(t *testing.T) {
 		}
 	}
 }
+
+func TestFoldFromTraining(t *testing.T) {
+	data := []struct {
+		p   string
+		in  uint64
+		out uint64
+	}{
+		{"(lambda (x_6545) (fold (shr4 (shr16 x_6545)) x_6545 (lambda (x_6546 x_6547) (or (not x_6547) x_6546))))", 5865335902571436511, 5865335902571436365},
+		{"(lambda (x) (fold (shr4 (shr16 x)) x (lambda (a b) (or (not b) a))))", 0x100000000, 0x0000000100000010},
+		{"(lambda (x) (fold (shr4 (shr16 x)) x (lambda (a b) (or b a))))", 0x100000000, 0x0000000100000010},
+		{"(lambda (x) (not x))", 0x1122334455667788, 0xEEDDCCBBAA998877},
+		{"(lambda (x) (fold x x (lambda (a b) (or (not b) a))))", 0x1122334455667788, 0x1122334455667711},
+		{"(lambda (x) (fold x 0 (lambda (y z) (or y z))))", 0x1122334455667788, 0x00000000000000FF},
+	}
+
+	for _, d := range data {
+		s := Parse([]byte(d.p))
+		if r := EvalProgram(s, d.in); r != d.out {
+			t.Errorf("expected %X, got '%X'", d.out, r)
+		}
+	}
+}

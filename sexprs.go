@@ -15,9 +15,14 @@ func Parse(input []byte) sexprs.Sexp {
 		panic("rest not empty: " + string(r))
 	}
 	if e != nil {
-		panic("failed to parse")
+		panic("failed to parse: " + string(input))
 	}
 	return s
+}
+
+func EvalProgram(p sexprs.Sexp, input uint64) uint64 {
+	arg := string(p.(sexprs.List)[1].(sexprs.List)[0].(sexprs.Atom).Value)
+	return Eval(p, Env{arg: input})
 }
 
 func Eval(e sexprs.Sexp, input Env) uint64 {
@@ -129,7 +134,7 @@ func evalLambda(params, body sexprs.Sexp, input Env) uint64 {
 func evalFold(vec, start, lambda sexprs.Sexp, input Env) uint64 {
 	vecv := Eval(vec, input)
 	acc := Eval(start, input)
-	for i := 7; i >= 0; i-- {
+	for i := 0; i <= 7; i++ {
 		left := (vecv << uint((7-i)*8)) >> uint(7*8)
 		localEnv := make(Env)
 		for k, v := range input {
