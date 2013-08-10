@@ -9,20 +9,20 @@ import (
 const NewGenerationSize = 300
 
 func GenNewRandomUniqGeneration(start s.Sexp) []s.Sexp {
-	return genNewRandomUniqGeneration(start, GenSexp)
+	return genNewRandomUniqGeneration(start, GenSexp, NewGenerationSize)
 }
 
-func GenNewRandomUniqGenerationUsing(start s.Sexp, ops []string) []s.Sexp {
-	return genNewRandomUniqGeneration(start, MetaMutator2(ops))
+func GenNewRandomUniqGenerationUsing(start s.Sexp, ops []string, size int) []s.Sexp {
+	return genNewRandomUniqGeneration(start, MetaMutator2(ops), size)
 }
 
-func genNewRandomUniqGeneration(start s.Sexp, m Mutator) []s.Sexp {
+func genNewRandomUniqGeneration(start s.Sexp, m Mutator, maxSize int) []s.Sexp {
 	muts := CountMutationPoints(start)
 	ret := make([]s.Sexp, 0, NewGenerationSize)
 	seen := make(map[string]bool)
 
 	fails := 0
-	for (len(ret) < NewGenerationSize) && (fails < NewGenerationSize) {
+	for (len(ret) < NewGenerationSize) && (fails < NewGenerationSize/5) {
 		mpoint := rand.Intn(muts) + 1
 		mutation, err := MutateAt(start, mpoint, m)
 		if err != nil {
