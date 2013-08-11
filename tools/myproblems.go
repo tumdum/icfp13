@@ -28,7 +28,7 @@ func main() {
   problemsToSort := Problems(problems)
   sort.Sort(problemsToSort)
   for _, problem := range problemsToSort {
-    if !problem.Solved {
+    if !problem.Solved && problem.TimeLeft == nil {
       fmt.Printf("go run tools/submiter.go %v %v ", problem.Id,problem.Size)
       for _, op := range problem.Operators {
         fmt.Printf("%v ", op)

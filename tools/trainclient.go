@@ -20,7 +20,7 @@ func RandomInput(size int) []string {
 }
 
 func CheckEval(psize int) {
-	for {
+	for i := 0; i < 5; i++ {
 		ri := RandomInput(255)
 		problem, e := service.Train(service.TrainRequest{psize, []string{"tfold"}})
 		if e != nil {
@@ -63,7 +63,7 @@ func verify(p string) {
 }
 
 func main() {
-	CheckEval(30)
+  	CheckEval(30)
 }
 
 func Xmain() {

@@ -41,7 +41,7 @@ type Problem struct {
 	Size      int
 	Operators []string
 	Solved    bool
-	TimeLeft  float32
+	TimeLeft  *float32
 }
 
 type GuessRequest struct {

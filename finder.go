@@ -82,7 +82,7 @@ func RemoveTooBig(sols Solutions, targetSize int) Solutions {
 	r := make(Solutions, 0)
 	dropped := 0
 	for _, sol := range sols {
-		if Size(sol.Prog) <= targetSize {
+		if Size(sol.Prog) < targetSize /*|| (Size(sol.Prog) == targetSize && sol.score == 1.0)*/ {
 			r = append(r, sol)
 		} else {
 			dropped++
