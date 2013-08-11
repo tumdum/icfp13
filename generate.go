@@ -4,6 +4,7 @@ import (
 	s "github.com/eadmund/sexprs"
 	"math/rand"
 	"strconv"
+  "bytes"
 )
 
 const NewGenerationSize = 600
@@ -137,9 +138,14 @@ func GenOp1s(e s.Sexp, v Vars) s.Sexp {
 
 func MetaOp2Named(op string) Mutator {
 	return func(e s.Sexp, v Vars) s.Sexp {
-		l := GenAtom(e, v)
-		r := GenAtom(e, v)
-		return s.List{MkAtom(op), l, r}
+    for {
+      l := GenAtom(e, v)
+      r := GenAtom(e, v)
+      if bytes.Compare(l.(s.Atom).Value,r.(s.Atom).Value) == 0 && (op == "or" || op == "and" || op == "xor") {
+        continue
+      }
+      return s.List{MkAtom(op), l, r}
+    }
 	}
 }
 
