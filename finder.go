@@ -12,7 +12,7 @@ const Percent = 0.7
 const MaxGenerationSize = 20000
 
 type Constraint struct {
-	in, out uint64
+	In, Out uint64
 }
 
 func Uint64() uint64 {
@@ -81,7 +81,7 @@ func RemoveTooBig(sols Solutions, targetSize int) Solutions {
 	r := make(Solutions, 0)
 	dropped := 0
 	for _, sol := range sols {
-		if Size(sol.prog) < targetSize {
+		if Size(sol.prog) <= targetSize {
 			r = append(r, sol)
 		} else {
 			dropped++
@@ -107,7 +107,7 @@ func HasTfold(ops []string) bool {
 	return false
 }
 
-func FindProgramPar(constraints []Constraint, ops []string, size int) {
+func FindProgramPar(constraints []Constraint, ops []string, size int) s.Sexp {
 	req := make(chan NextGenReq)
 	out := make(chan Solutions)
 	merged := make(chan Solutions)
@@ -118,12 +118,13 @@ func FindProgramPar(constraints []Constraint, ops []string, size int) {
 	go Generator(req, out, stop, NewGenerationSize)
 
 	var start s.Sexp
+  var solution s.Sexp
 	if HasTfold(ops) {
 		start = Parse([]byte("(lambda (const_x) (fold const_x const_0 (lambda (const_x y) e)))"))
 	} else {
 		start = Parse([]byte(StartSexp))
 	}
-	sols := NextGeneration(start, constraints, ops, NewGenerationSize)
+	sols := NextGeneration(start, constraints, ops, 10 * NewGenerationSize)
 	i := 0
 	lastBestScore := 0.0
 	for {
@@ -137,28 +138,28 @@ func FindProgramPar(constraints []Constraint, ops []string, size int) {
 		newsols = <-merged
 
 		sort.Sort(newsols)
-		sols = TakeBestPercent(Percent, newsols)
+    fmt.Println("best score:", sols[0].score)
 		if sols[0].score == 1.0 {
 			fmt.Println("found solution:", sols[0].prog)
-			Score(sols[0].prog, constraints)
-			break
+      return sols[0].prog
 		}
+		sols = TakeBestPercent(Percent, newsols)
 		if sols[0].score > 0.0 {
 			sols = RemoveTooBig(sols, size)
-			fmt.Println("best score:", sols[0].score)
-			if lastBestScore >= sols[0].score {
-				sols = TakeBestPercent(Percent, NextGeneration(start, constraints, ops, NewGenerationSize))
+			if len(sols) == 0 || lastBestScore >= sols[0].score {
+				sols = TakeBestPercent(Percent, NextGeneration(start, constraints, ops, 10 * NewGenerationSize))
 				lastBestScore = 0.0
 				i = 0
 			}
 			if sols[0].score == 0.0 && len(sols) >= MaxGenerationSize*2 {
 				i = 0
 				lastBestScore = 0
-				sols = NextGeneration(start, constraints, ops, NewGenerationSize)
+				sols = NextGeneration(start, constraints, ops, 10*  NewGenerationSize)
 			}
 		}
 		i++
 	}
+  return solution
 }
 
 type Solution struct {
@@ -194,8 +195,8 @@ func Score(e s.Sexp, cons []Constraint) float64 {
 	total := float64(len(cons))
 	ok := float64(0)
 	for _, con := range cons {
-		r := EvalProgram(e, con.in)
-		if r == con.out {
+		r := EvalProgram(e, con.In)
+		if r == con.Out {
 			ok = ok + 1.0
 		}
 	}

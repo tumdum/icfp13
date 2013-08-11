@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-const NewGenerationSize = 300
+const NewGenerationSize = 600
 
 func GenNewRandomUniqGeneration(start s.Sexp) []s.Sexp {
 	return genNewRandomUniqGeneration(start, GenSexp, NewGenerationSize)

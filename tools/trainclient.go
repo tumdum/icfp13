@@ -48,7 +48,6 @@ func CheckEval(psize int) {
 func verify(p string) {
   inputs := []string{}
   for i := uint64(0); i < 255; i++ {
-    // inputs = append(inputs, "0x" + strconv.FormatUint(i*10, 16))
     inputs = append(inputs, "0x100")
   }
   prog := icfp13.Parse([]byte(p))
@@ -65,7 +64,6 @@ func verify(p string) {
 
 func main() {
 	CheckEval(30)
-  // verify("(lambda (x) (fold x 0 (lambda (x a) (plus x a))))")
 }
 
 func Xmain() {
