@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
   "runtime"
-  "runtime/pprof"
 )
 
 const TestDataSize = 70
@@ -32,6 +31,7 @@ func RandomInput(size int) []string {
   ret = append(ret, "0x00000000FFE00000")
   ret = append(ret, "0x7FFFFFFFFFFFFFFF")
   ret = append(ret, "0xFFFFF00000FFFFF0")
+  ret = append(ret, "0x0000000000010008")
 	return ret
 }
 
