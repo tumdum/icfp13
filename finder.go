@@ -133,7 +133,7 @@ func FindProgramPar(constraints []Constraint, ops []string, size int, solret cha
 	i := 0
 	lastBestScore := 0.0
 	for {
-		fmt.Println("iter:", i, len(sols))
+		fmt.Println("iter:", i, len(sols), sols[0].score)
 		newsols := make(Solutions, 0)
 		go CollectResults(out, len(sols), merged, solret)
 		for _, sol := range sols {
