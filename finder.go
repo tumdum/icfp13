@@ -63,7 +63,7 @@ func Generator(reqs chan NextGenReq, out chan Solutions, stop chan bool, size in
 	}
 }
 
-func CollectResults(out chan Solutions, count int, ret chan Solutions) {
+func CollectResults(out chan Solutions, count int, ret chan Solutions, solret chan Solution) {
 	newsols := make(Solutions, 0)
 	for i := 0; i < count; i++ {
 		ss := <-out
@@ -71,6 +71,7 @@ func CollectResults(out chan Solutions, count int, ret chan Solutions) {
 		for _, sol := range ss {
 			if sol.score == 1.0 {
 				// fmt.Println("found solution",sol.prog)
+        solret <- sol
 			}
 		}
 	}
@@ -81,7 +82,7 @@ func RemoveTooBig(sols Solutions, targetSize int) Solutions {
 	r := make(Solutions, 0)
 	dropped := 0
 	for _, sol := range sols {
-		if Size(sol.prog) <= targetSize {
+		if Size(sol.Prog) <= targetSize {
 			r = append(r, sol)
 		} else {
 			dropped++
@@ -107,7 +108,7 @@ func HasTfold(ops []string) bool {
 	return false
 }
 
-func FindProgramPar(constraints []Constraint, ops []string, size int) s.Sexp {
+func FindProgramPar(constraints []Constraint, ops []string, size int, solret chan Solution) s.Sexp {
 	req := make(chan NextGenReq)
 	out := make(chan Solutions)
 	merged := make(chan Solutions)
@@ -130,9 +131,9 @@ func FindProgramPar(constraints []Constraint, ops []string, size int) s.Sexp {
 	for {
 		fmt.Println("iter:", i, len(sols))
 		newsols := make(Solutions, 0)
-		go CollectResults(out, len(sols), merged)
+		go CollectResults(out, len(sols), merged, solret)
 		for _, sol := range sols {
-			req <- NextGenReq{sol.prog, constraints, ops}
+			req <- NextGenReq{sol.Prog, constraints, ops}
 		}
 
 		newsols = <-merged
@@ -140,8 +141,8 @@ func FindProgramPar(constraints []Constraint, ops []string, size int) s.Sexp {
 		sort.Sort(newsols)
     fmt.Println("best score:", sols[0].score)
 		if sols[0].score == 1.0 {
-			fmt.Println("found solution:", sols[0].prog)
-      return sols[0].prog
+			fmt.Println("found solution:", sols[0].Prog)
+      return sols[0].Prog
 		}
 		sols = TakeBestPercent(Percent, newsols)
 		if sols[0].score > 0.0 {
@@ -163,7 +164,7 @@ func FindProgramPar(constraints []Constraint, ops []string, size int) s.Sexp {
 }
 
 type Solution struct {
-	prog  s.Sexp
+	Prog  s.Sexp
 	score float64
 }
 

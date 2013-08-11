@@ -29,10 +29,20 @@ func RandomInput(size int) []string {
 func GetConstraints(id string) []icfp13.Constraint {
 	ri := RandomInput(TestDataSize)
 	ereq := service.EvalRequest{id, "", ri}
-	eresp, e := service.Eval(ereq)
+  var eresp *service.EvalResponse
+  var e error
+  for {
+	eresp, e = service.Eval(ereq)
+  if e != nil && strings.HasPrefix(e.Error(), "429") {
+			time.Sleep(5 * time.Second)
+			continue
+		}
+
 	if e != nil {
 		panic(e)
 	}
+  break
+  }
 
 	cons := make([]icfp13.Constraint, len(ri))
 	for i := 0; i < len(cons); i++ {
@@ -45,11 +55,14 @@ func GetConstraints(id string) []icfp13.Constraint {
 
 func Solve(id string, size int, ops []string) {
 	constraints := GetConstraints(id)
-	solution := icfp13.FindProgramPar(constraints, ops, size)
+  ret := make(chan icfp13.Solution)
+	go icfp13.FindProgramPar(constraints, ops, size, ret)
+  solution := <-ret
 	fmt.Println(solution)
-	solstr := solution.String()
+	solstr := solution.Prog.String()
 	solstr = strings.Replace(solstr, " __0", " 0", -1)
 	solstr = strings.Replace(solstr, " __1", " 1", -1)
+  solstr = strings.Replace(solstr, "const_","", -1)
 
 	for {
 
