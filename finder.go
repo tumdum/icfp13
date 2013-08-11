@@ -143,11 +143,6 @@ func FindProgramPar(constraints []Constraint, ops []string, size int, solret cha
 		newsols = <-merged
 
 		sort.Sort(newsols)
-    fmt.Println("best score:", sols[0].score)
-		if sols[0].score == 1.0 {
-			fmt.Println("found solution:", sols[0].Prog)
-      return sols[0].Prog
-		}
 		sols = TakeBestPercent(Percent, newsols)
 		if sols[0].score > 0.0 {
 			sols = RemoveTooBig(sols, size)
