@@ -96,7 +96,10 @@ func Solve(id string, size int, ops []string) {
 			break
 		}
 		fmt.Println(gs)
-    if gs.Status == "mismatch" || gs.Status == "error" {
+    if gs.Status == "mismatch"  {
+      os.Exit(1)
+    }
+    if gs.Status == "error" {
       os.Exit(1)
     }
 

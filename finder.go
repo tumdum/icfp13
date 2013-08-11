@@ -100,6 +100,15 @@ func GenSize(iterNumber int) int {
 	return NewGenerationSize
 }
 
+func HasBonus(ops []string) bool {
+	for _, op := range ops {
+		if op == "bonus" {
+			return true
+		}
+	}
+	return false
+}
+
 func HasTfold(ops []string) bool {
 	for _, op := range ops {
 		if op == "tfold" {
@@ -126,7 +135,16 @@ func FindProgramPar(constraints []Constraint, ops []string, size int, solret cha
   var solution s.Sexp
 	if HasTfold(ops) {
 		start = Parse([]byte("(lambda (const_x) (fold const_x const_0 (lambda (const_x y) e)))"))
-	} else {
+	} else if HasBonus(ops) {
+    start = Parse([]byte("(lambda (x) (if0 x x x))"))
+    newOps := make([]string,0)
+    for _, op := range ops {
+      if op != "bonus" && op != "if0" {
+        newOps = append(newOps, op)
+      }
+    }
+    ops = newOps
+  } else {
 		start = Parse([]byte(StartSexp))
 	}
 	sols := NextGeneration(start, constraints, ops, 10 * NewGenerationSize)
