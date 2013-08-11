@@ -9,9 +9,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+  "runtime"
 )
 
-const TestDataSize = 50
+const TestDataSize = 70
 
 func RandomInput(size int) []string {
 	ret := make([]string, size)
@@ -23,6 +24,7 @@ func RandomInput(size int) []string {
 	}
 	ret = append(ret, "0x0")
 	ret = append(ret, "0xffffffffffffffff")
+  ret = append(ret, "0x0000000000000020")
 	return ret
 }
 
@@ -83,6 +85,7 @@ func Solve(id string, size int, ops []string) {
 }
 
 func main() {
+  runtime.GOMAXPROCS(4)
 	id := os.Args[1]
 	size, _ := strconv.Atoi(os.Args[2])
 	ops := make([]string, 0)

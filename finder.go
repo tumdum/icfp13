@@ -109,7 +109,7 @@ func HasTfold(ops []string) bool {
 }
 
 func FindProgramPar(constraints []Constraint, ops []string, size int, solret chan Solution) s.Sexp {
-	req := make(chan NextGenReq)
+	req := make(chan NextGenReq,10)
 	out := make(chan Solutions)
 	merged := make(chan Solutions)
 	stop := make(chan bool)
