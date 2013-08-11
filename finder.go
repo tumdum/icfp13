@@ -9,8 +9,8 @@ import (
 )
 
 const StartSexp = "(lambda (x) x)"
-const Percent = 0.7
-const MaxGenerationSize = 15000
+const Percent = 0.6
+const MaxGenerationSize = 10000
 
 type Constraint struct {
 	In, Out uint64
