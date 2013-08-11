@@ -5,6 +5,7 @@ import (
 	s "github.com/eadmund/sexprs"
 	"math/rand"
 	"sort"
+  "runtime"
 )
 
 const StartSexp = "(lambda (x) x)"
@@ -113,10 +114,13 @@ func FindProgramPar(constraints []Constraint, ops []string, size int, solret cha
 	out := make(chan Solutions)
 	merged := make(chan Solutions)
 	stop := make(chan bool)
+  for i := 0; i < runtime.NumCPU(); i++ {
+	go Generator(req, out, stop, NewGenerationSize)
+  }
+	/* go Generator(req, out, stop, NewGenerationSize)
 	go Generator(req, out, stop, NewGenerationSize)
 	go Generator(req, out, stop, NewGenerationSize)
-	go Generator(req, out, stop, NewGenerationSize)
-	go Generator(req, out, stop, NewGenerationSize)
+  */
 
 	var start s.Sexp
   var solution s.Sexp

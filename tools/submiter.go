@@ -96,7 +96,7 @@ func Solve(id string, size int, ops []string) {
 }
 
 func main() {
-  runtime.GOMAXPROCS(4)
+  runtime.GOMAXPROCS(runtime.NumCPU())
 	id := os.Args[1]
 	size, _ := strconv.Atoi(os.Args[2])
 	ops := make([]string, 0)
