@@ -83,7 +83,7 @@ func MetaMutator2(ops []string) Mutator {
 	m["plus"] = MetaOp2Named("plus")
 	m["if0"] = GenIf0
 	m["fold"] = GenFold
-	m["tfold"] = GenFold
+	// m["tfold"] = GenFold
 
 	selected := make([]Mutator, 0)
 	for _, op := range ops {

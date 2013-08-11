@@ -25,6 +25,10 @@ func RandomInput(size int) []string {
 	ret = append(ret, "0x0")
 	ret = append(ret, "0xffffffffffffffff")
   ret = append(ret, "0x0000000000000020")
+  ret = append(ret, "0x0000000000000001")
+  ret = append(ret, "0x0000000000000010")
+  ret = append(ret, "0x000000000010FFFF")
+  ret = append(ret, "0x00000000FFE00000")
 	return ret
 }
 
