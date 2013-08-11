@@ -22,6 +22,7 @@ func RandomInput(size int) []string {
 		v := v1 + v2
 		ret[i] = "0x" + strconv.FormatUint(v, 16)
 	}
+ret = append(ret, "0x8000000000000000")
 ret = append(ret, "0x0161C08342C010DF")
 	ret = append(ret, "0x0")
 	ret = append(ret, "0xffffffffffffffff")
