@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
-  "runtime"
 )
 
 const TestDataSize = 70
@@ -22,39 +22,39 @@ func RandomInput(size int) []string {
 		v := v1 + v2
 		ret[i] = "0x" + strconv.FormatUint(v, 16)
 	}
-ret = append(ret, "0x18F8F8F8F8F8F5EF")
-ret = append(ret, "0xF000000000000001")
-ret = append(ret, "0x0000000000020000")
-ret = append(ret, "0xFFFF80003FFFDFFF")
-ret = append(ret, "0xFFFFFFFFF0000001")
-ret = append(ret, "0x0000000000000040")
-ret = append(ret, "0xE108108020400180")
-ret = append(ret, "0x4001802001020200")
-ret = append(ret, "0xFFFF0000FFFF0001")
-ret = append(ret, "0x8707040005020503")
-ret = append(ret, "0xFFFFFFFFFFFE0000")
-ret = append(ret, "0x0000000000000030")
-ret = append(ret, "0xF0F0F0F0F0F0F0F1")
-ret = append(ret, "0x00000FFFFFFFFFFE")
-ret = append(ret, "0x3333333333333333")
-ret = append(ret, "0x8000000000000004")
-ret = append(ret, "0x0000000000000004")
-ret = append(ret, "0x0200FE062020201E")
-ret = append(ret, "0xAAAAAAAAAAAAAAAB")
-ret = append(ret, "0x80000000D652A6AA")
-ret = append(ret, "0x8000000000000000")
-ret = append(ret, "0x0161C08342C010DF")
+	ret = append(ret, "0x18F8F8F8F8F8F5EF")
+	ret = append(ret, "0xF000000000000001")
+	ret = append(ret, "0x0000000000020000")
+	ret = append(ret, "0xFFFF80003FFFDFFF")
+	ret = append(ret, "0xFFFFFFFFF0000001")
+	ret = append(ret, "0x0000000000000040")
+	ret = append(ret, "0xE108108020400180")
+	ret = append(ret, "0x4001802001020200")
+	ret = append(ret, "0xFFFF0000FFFF0001")
+	ret = append(ret, "0x8707040005020503")
+	ret = append(ret, "0xFFFFFFFFFFFE0000")
+	ret = append(ret, "0x0000000000000030")
+	ret = append(ret, "0xF0F0F0F0F0F0F0F1")
+	ret = append(ret, "0x00000FFFFFFFFFFE")
+	ret = append(ret, "0x3333333333333333")
+	ret = append(ret, "0x8000000000000004")
+	ret = append(ret, "0x0000000000000004")
+	ret = append(ret, "0x0200FE062020201E")
+	ret = append(ret, "0xAAAAAAAAAAAAAAAB")
+	ret = append(ret, "0x80000000D652A6AA")
+	ret = append(ret, "0x8000000000000000")
+	ret = append(ret, "0x0161C08342C010DF")
 	ret = append(ret, "0x0")
 	ret = append(ret, "0xffffffffffffffff")
-ret = append(ret, "0x0000000900000000")
-  ret = append(ret, "0x0000000000000020")
-  ret = append(ret, "0x0000000000000001")
-  ret = append(ret, "0x0000000000000010")
-  ret = append(ret, "0x000000000010FFFF")
-  ret = append(ret, "0x00000000FFE00000")
-  ret = append(ret, "0x7FFFFFFFFFFFFFFF")
-  ret = append(ret, "0xFFFFF00000FFFFF0")
-  ret = append(ret, "0x0000000000010008")
+	ret = append(ret, "0x0000000900000000")
+	ret = append(ret, "0x0000000000000020")
+	ret = append(ret, "0x0000000000000001")
+	ret = append(ret, "0x0000000000000010")
+	ret = append(ret, "0x000000000010FFFF")
+	ret = append(ret, "0x00000000FFE00000")
+	ret = append(ret, "0x7FFFFFFFFFFFFFFF")
+	ret = append(ret, "0xFFFFF00000FFFFF0")
+	ret = append(ret, "0x0000000000010008")
 	ret = append(ret, "0x8000000000008000")
 	return ret
 }
@@ -62,20 +62,20 @@ ret = append(ret, "0x0000000900000000")
 func GetConstraints(id string) []icfp13.Constraint {
 	ri := RandomInput(TestDataSize)
 	ereq := service.EvalRequest{id, "", ri}
-  var eresp *service.EvalResponse
-  var e error
-  for {
-	eresp, e = service.Eval(ereq)
-  if e != nil && strings.HasPrefix(e.Error(), "429") {
+	var eresp *service.EvalResponse
+	var e error
+	for {
+		eresp, e = service.Eval(ereq)
+		if e != nil && strings.HasPrefix(e.Error(), "429") {
 			time.Sleep(5 * time.Second)
 			continue
 		}
 
-	if e != nil {
-		panic(e)
+		if e != nil {
+			panic(e)
+		}
+		break
 	}
-  break
-  }
 
 	cons := make([]icfp13.Constraint, len(ri))
 	for i := 0; i < len(cons); i++ {
@@ -88,14 +88,14 @@ func GetConstraints(id string) []icfp13.Constraint {
 
 func Solve(id string, size int, ops []string) {
 	constraints := GetConstraints(id)
-  ret := make(chan icfp13.Solution)
+	ret := make(chan icfp13.Solution)
 	go icfp13.FindProgramPar(constraints, ops, size, ret)
-  solution := <-ret
+	solution := <-ret
 	fmt.Println(solution)
 	solstr := solution.Prog.String()
 	solstr = strings.Replace(solstr, " __0", " 0", -1)
 	solstr = strings.Replace(solstr, " __1", " 1", -1)
-  solstr = strings.Replace(solstr, "const_","", -1)
+	solstr = strings.Replace(solstr, "const_", "", -1)
 
 	for {
 
@@ -111,19 +111,19 @@ func Solve(id string, size int, ops []string) {
 			break
 		}
 		fmt.Println(gs)
-    if gs.Status == "mismatch"  {
-      os.Exit(1)
-    }
-    if gs.Status == "error" {
-      os.Exit(1)
-    }
+		if gs.Status == "mismatch" {
+			os.Exit(1)
+		}
+		if gs.Status == "error" {
+			os.Exit(1)
+		}
 
-    break
+		break
 	}
 }
 
 func main() {
-  runtime.GOMAXPROCS(runtime.NumCPU())
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	id := os.Args[1]
 	size, _ := strconv.Atoi(os.Args[2])
 	ops := make([]string, 0)

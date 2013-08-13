@@ -46,24 +46,24 @@ func CheckEval(psize int) {
 }
 
 func verify(p string) {
-  inputs := []string{}
-  for i := uint64(0); i < 255; i++ {
-    inputs = append(inputs, "0x100")
-  }
-  prog := icfp13.Parse([]byte(p))
-  ereq := service.EvalRequest{"", p, inputs}
-  eresp, _ := service.Eval(ereq)
-  fmt.Println(eresp)
-  for i, val := range eresp.Outputs {
-    in, _ := strconv.ParseUint(inputs[i], 0, 64)
-    progRet := icfp13.EvalProgram(prog, in)
-    out, _ := strconv.ParseUint(val, 0, 64)
-    fmt.Printf("%d: %s => %X <= %X\n", i, inputs[i], out, progRet)
-  }
+	inputs := []string{}
+	for i := uint64(0); i < 255; i++ {
+		inputs = append(inputs, "0x100")
+	}
+	prog := icfp13.Parse([]byte(p))
+	ereq := service.EvalRequest{"", p, inputs}
+	eresp, _ := service.Eval(ereq)
+	fmt.Println(eresp)
+	for i, val := range eresp.Outputs {
+		in, _ := strconv.ParseUint(inputs[i], 0, 64)
+		progRet := icfp13.EvalProgram(prog, in)
+		out, _ := strconv.ParseUint(val, 0, 64)
+		fmt.Printf("%d: %s => %X <= %X\n", i, inputs[i], out, progRet)
+	}
 }
 
 func main() {
-  	CheckEval(30)
+	CheckEval(30)
 }
 
 func Xmain() {

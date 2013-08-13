@@ -7,22 +7,22 @@ import (
 
 type Env map[string]uint64
 
-var listFuns map[string]func(sexprs.List,Env) uint64
+var listFuns map[string]func(sexprs.List, Env) uint64
 
 func init() {
-  listFuns = make(map[string]func(sexprs.List,Env) uint64)
-  listFuns["or"] = evalOr
-  listFuns["and"] = evalAnd
-  listFuns["xor"] = evalXor
-  listFuns["plus"] = evalPlus
-  listFuns["not"] = evalNot
-  listFuns["shl1"] = evalShl1
-  listFuns["shr1"] = evalShr1
-  listFuns["shr4"] = evalShr4
-  listFuns["shr16"] = evalShr16
-  listFuns["if0"] = evalIf0
-  listFuns["lambda"] = evalLambda
-  listFuns["fold"] = evalFold
+	listFuns = make(map[string]func(sexprs.List, Env) uint64)
+	listFuns["or"] = evalOr
+	listFuns["and"] = evalAnd
+	listFuns["xor"] = evalXor
+	listFuns["plus"] = evalPlus
+	listFuns["not"] = evalNot
+	listFuns["shl1"] = evalShl1
+	listFuns["shr1"] = evalShr1
+	listFuns["shr4"] = evalShr4
+	listFuns["shr16"] = evalShr16
+	listFuns["if0"] = evalIf0
+	listFuns["lambda"] = evalLambda
+	listFuns["fold"] = evalFold
 }
 
 func Parse(input []byte) sexprs.Sexp {
@@ -56,37 +56,37 @@ func Eval(e sexprs.Sexp, input Env) uint64 {
 
 func evalList(l sexprs.List, input Env) uint64 {
 	head := string(l[0].(sexprs.Atom).Value)
-  return listFuns[head](l, input)
+	return listFuns[head](l, input)
 	/*switch head {
-	case "or":
-		// return evalOr(l[1], l[2], input)
-    return evalOr(l, input)
-	case "and":
-		// return evalAnd(l[1], l[2], input)
-    return evalAnd(l, input)
-	case "xor":
-		return evalXor(l, input)
-	case "plus":
-		return evalPlus(l, input)
-	case "not":
-		return evalNot(l, input)
-	case "shl1":
-		return evalShl1(l, input)
-	case "shr1":
-		return evalShr1(l, input)
-	case "shr4":
-		return evalShr4(l, input)
-	case "shr16":
-		return evalShr16(l, input)
-	case "if0":
-		return evalIf0(l, input)
-	case "lambda":
-		return evalLambda(l, input)
-	case "fold":
-		return evalFold(l, input)
-	default:
-		panic("unknown list head: " + head)
-	}*/
+		case "or":
+			// return evalOr(l[1], l[2], input)
+	    return evalOr(l, input)
+		case "and":
+			// return evalAnd(l[1], l[2], input)
+	    return evalAnd(l, input)
+		case "xor":
+			return evalXor(l, input)
+		case "plus":
+			return evalPlus(l, input)
+		case "not":
+			return evalNot(l, input)
+		case "shl1":
+			return evalShl1(l, input)
+		case "shr1":
+			return evalShr1(l, input)
+		case "shr4":
+			return evalShr4(l, input)
+		case "shr16":
+			return evalShr16(l, input)
+		case "if0":
+			return evalIf0(l, input)
+		case "lambda":
+			return evalLambda(l, input)
+		case "fold":
+			return evalFold(l, input)
+		default:
+			panic("unknown list head: " + head)
+		}*/
 }
 
 func evalOr(l sexprs.List, input Env) uint64 {

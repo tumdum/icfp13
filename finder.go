@@ -4,8 +4,8 @@ import (
 	"fmt"
 	s "github.com/eadmund/sexprs"
 	"math/rand"
+	"runtime"
 	"sort"
-  "runtime"
 )
 
 const StartSexp = "(lambda (x) x)"
@@ -72,7 +72,7 @@ func CollectResults(out chan Solutions, count int, ret chan Solutions, solret ch
 		for _, sol := range ss {
 			if sol.score == 1.0 {
 				// fmt.Println("found solution",sol.prog)
-        solret <- sol
+				solret <- sol
 			}
 		}
 	}
@@ -119,35 +119,35 @@ func HasTfold(ops []string) bool {
 }
 
 func FindProgramPar(constraints []Constraint, ops []string, size int, solret chan Solution) s.Sexp {
-	req := make(chan NextGenReq,10)
+	req := make(chan NextGenReq, 10)
 	out := make(chan Solutions)
 	merged := make(chan Solutions)
 	stop := make(chan bool)
-  for i := 0; i < runtime.NumCPU(); i++ {
-	go Generator(req, out, stop, NewGenerationSize)
-  }
+	for i := 0; i < runtime.NumCPU(); i++ {
+		go Generator(req, out, stop, NewGenerationSize)
+	}
 	/* go Generator(req, out, stop, NewGenerationSize)
 	go Generator(req, out, stop, NewGenerationSize)
 	go Generator(req, out, stop, NewGenerationSize)
-  */
+	*/
 
 	var start s.Sexp
-  var solution s.Sexp
+	var solution s.Sexp
 	if HasTfold(ops) {
 		start = Parse([]byte("(lambda (const_x) (fold const_x const_0 (lambda (const_x y) e)))"))
 	} else if HasBonus(ops) {
-    start = Parse([]byte("(lambda (x) (if0 x x x))"))
-    newOps := make([]string,0)
-    for _, op := range ops {
-      if op != "bonus" && op != "if0" {
-        newOps = append(newOps, op)
-      }
-    }
-    ops = newOps
-  } else {
+		start = Parse([]byte("(lambda (x) (if0 x x x))"))
+		newOps := make([]string, 0)
+		for _, op := range ops {
+			if op != "bonus" && op != "if0" {
+				newOps = append(newOps, op)
+			}
+		}
+		ops = newOps
+	} else {
 		start = Parse([]byte(StartSexp))
 	}
-	sols := NextGeneration(start, constraints, ops, 10 * NewGenerationSize)
+	sols := NextGeneration(start, constraints, ops, 10*NewGenerationSize)
 	i := 0
 	lastBestScore := 0.0
 	for {
@@ -165,19 +165,19 @@ func FindProgramPar(constraints []Constraint, ops []string, size int, solret cha
 		if sols[0].score > 0.0 {
 			sols = RemoveTooBig(sols, size)
 			if len(sols) == 0 || lastBestScore >= sols[0].score {
-				sols = TakeBestPercent(Percent, NextGeneration(start, constraints, ops, 10 * NewGenerationSize))
+				sols = TakeBestPercent(Percent, NextGeneration(start, constraints, ops, 10*NewGenerationSize))
 				lastBestScore = 0.0
 				i = 0
 			}
 			if sols[0].score == 0.0 && len(sols) >= MaxGenerationSize*2 {
 				i = 0
 				lastBestScore = 0
-				sols = NextGeneration(start, constraints, ops, 10*  NewGenerationSize)
+				sols = NextGeneration(start, constraints, ops, 10*NewGenerationSize)
 			}
 		}
 		i++
 	}
-  return solution
+	return solution
 }
 
 type Solution struct {
